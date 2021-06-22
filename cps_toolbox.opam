@@ -1,5 +1,5 @@
 opam-version: "2.0"
-name: "cps_toolbox"
+name: "cps-toolbox"
 version: "0.1"
 synopsis: "A partial OCaml standard library replacement written with continuation passing style in mind"
 maintainer: "Soren Norbaek <sorennorbaek@gmail.com>"
