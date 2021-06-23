@@ -7,6 +7,12 @@ let empty = AVL.null
 let is_empty set = (AVL.get_count set) = 0
 let is_member = AVL.is_member
 let get_member = AVL.get_member
+
+let get_member_unsafe order items=
+  AVL.get_member order items
+    (fun () -> assert false (* Invariant *))
+    identity
+
 let size = AVL.get_count
 let add = AVL.insert
 let remove = AVL.remove

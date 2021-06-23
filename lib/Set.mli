@@ -4,6 +4,7 @@ val empty : 'a set
 val is_empty : 'a set -> bool
 val is_member : 'a compare -> 'a -> 'a set -> (unit -> 'r) -> (unit -> 'r) -> 'r
 val get_member : int -> 'a set -> (unit -> 'r) -> ('a -> 'r) -> 'r
+val get_member_unsafe : int -> 'a set -> 'a
 val size : 'a set -> int
 val add : 'a compare -> 'a -> 'a set -> 'a set
 val remove : 'a compare -> 'a -> 'a set -> 'a set

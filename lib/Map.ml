@@ -75,7 +75,7 @@ let lookup order key binds fail return =
   in
   _visit binds
 
-let lookup_unsafe order key binds return =
+let lookup_unsafe order key binds =
   let open AVL in
   let open Order in
   let rec _visit tree =
@@ -83,7 +83,7 @@ let lookup_unsafe order key binds return =
     | Null -> assert false
     | Node (_, _, data, left, right) ->
       match order key (get_key data) with
-      | EQ -> get_value_unsafe data return
+      | EQ -> get_value_unsafe data identity
       | LT -> _visit left
       | GT -> _visit right
   in

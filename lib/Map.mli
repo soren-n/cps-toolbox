@@ -13,7 +13,7 @@ val remove : ('key -> 'key -> Order.t) -> 'key -> ('key, 'value) map
 val lookup : ('key -> 'key -> Order.t) -> 'key -> ('key, 'value) map
   -> (unit -> 'r) -> ('value -> 'r) -> 'r
 val lookup_unsafe : ('key -> 'key -> Order.t) -> 'key -> ('key, 'value) map
-  -> ('value -> 'r) -> 'r
+  -> 'value
 val entries : ('key, 'value) map -> ('key * 'value) list
 val keys : ('key, 'value) map -> 'key list
 val values : ('key, 'value) map -> 'value list
