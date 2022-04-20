@@ -1,31 +1,27 @@
 open Functional
 
-type 'a tree =
+type 'a t =
   | Null
-  | Node of int * int * 'a * 'a tree * 'a tree
-
-type 'a compare = 'a -> 'a -> Order.t
+  | Node of int * int * 'a * 'a t * 'a t
 
 let null = Null
 let node count height data left right =
   Node (count, height, data, left, right)
 
-let fold null_case node_case tree =
-  let rec _visit tree return =
+let fold tree null_case node_case =
+  let rec _visit tree =
     match tree with
-    | Null -> return null_case
+    | Null -> null_case
     | Node (count, height, data, left, right) ->
-      _visit left @@ fun left1 ->
-      _visit right @@ fun right1 ->
-      return (node_case count height data left1 right1)
+      _visit left |> fun left1 ->
+      _visit right |> fun right1 ->
+      node_case count height data left1 right1
   in
-  _visit tree identity
+  _visit tree
 
-let map f tree =
-  fold Null
-    (fun count height data left right ->
-      node count height (f data) left right)
-    tree
+let map func tree =
+  fold tree Null @@ fun count height data left right ->
+  node count height (func data) left right
 
 let get_count tree =
   match tree with
@@ -138,7 +134,7 @@ let remove order data tree =
       begin match order data data' with
       | Order.EQ ->
         begin match left, right with
-        | Null, Null -> return null
+        | Null, Null -> return Null
         | Null, _ ->
           let data' = _leftmost right in
           _visit right Order.GT data'
@@ -231,54 +227,55 @@ let get_rightmost tree fail return =
   _visit tree
 
 let to_list tree =
-  fold
+  fold tree
     (fun result return -> return result)
     (fun _ _ data visit_left visit_right result return ->
       visit_right result @@ fun result1 ->
       visit_left (data :: result1) return)
-    tree [] identity
+    [] identity
 
 let from_list items =
-  let _pop items f =
+  let open Order in
+  let _pop items func =
     match items with
-    | item :: items' -> f item items'
+    | item :: items' -> func item items'
     | [] -> assert false
   in
   let rec _build pos count items return =
     match count with
-    | 0 -> return items 0 null
+    | 0 -> return items 0 Null
     | 1 ->
-      _pop items (fun data items1 ->
-      return items1 1 (node 1 1 data null null))
+      _pop items @@ fun data items1 ->
+      return items1 1 (node 1 1 data Null Null)
     | _ ->
       let n = count - 1 in
       let m = n / 2 in
       let _left () =
         let sm = m + 1 in
-        _build Order.LT sm items (fun items1 l_h left ->
-        _pop items1 (fun data items2 ->
-        _build Order.GT m items2 (fun items3 r_h right ->
+        _build LT sm items @@ fun items1 l_h left ->
+        _pop items1 @@ fun data items2 ->
+        _build GT m items2 @@ fun items3 r_h right ->
         let height = (max l_h r_h) + 1 in
-        return items3 height (node count height data left right))))
+        return items3 height (node count height data left right)
       in
       let _right () =
         let sm = m + 1 in
-        _build Order.LT m items (fun items1 l_h left ->
-        _pop items1 (fun data items2 ->
-        _build Order.GT sm items2 (fun items3 r_h right ->
+        _build LT m items @@ fun items1 l_h left ->
+        _pop items1 @@ fun data items2 ->
+        _build GT sm items2 @@ fun items3 r_h right ->
         let height = (max l_h r_h) + 1 in
-        return items3 height (node count height data left right))))
+        return items3 height (node count height data left right)
       in
       begin match pos, n mod 2 with
       | _, 0 ->
-        _build Order.LT m items (fun items1 l_h left ->
-        _pop items1 (fun data items2 ->
-        _build Order.GT m items2 (fun items3 r_h right ->
+        _build LT m items @@ fun items1 l_h left ->
+        _pop items1 @@ fun data items2 ->
+        _build GT m items2 @@ fun items3 r_h right ->
         let height = (max l_h r_h) + 1 in
-        return items3 height (node count height data left right))))
-      | Order.EQ, _ | Order.LT, _ -> _left ()
-      | Order.GT, _ -> _right ()
+        return items3 height (node count height data left right)
+      | EQ, _ | LT, _ -> _left ()
+      | GT, _ -> _right ()
       end
   in
   List.length items |> fun count ->
-  _build Order.EQ count items @@ fun _ _ result -> result
+  _build EQ count items @@ fun _ _ result -> result

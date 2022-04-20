@@ -1,3 +1,3 @@
 val zero : int
 val succ : int -> int
-val fold : 'r -> ('r -> 'r) -> int -> 'r
+val fold : int -> 'r -> ('r -> 'r) -> 'r

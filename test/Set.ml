@@ -25,22 +25,18 @@ let arbitrary_set order a =
     ~shrink:set_shrink
 
 let set_is_subset order xs ys =
-  Set.fold true
-    (fun x prev ->
-      if not prev then false else
-      Set.is_member order x ys
-        (fun () -> false)
-        (fun () -> true))
-    xs
+  Set.fold xs true @@ fun x prev ->
+  if not prev then false else
+  Set.is_member order x ys
+    (fun () -> false)
+    (fun () -> true)
 
 let set_has_intersection order xs ys =
-  Set.fold false
-    (fun x prev ->
-      if prev then true else
-      Set.is_member order x ys
-        (fun () -> false)
-        (fun () -> true))
-    xs
+  Set.fold xs false @@ fun x prev ->
+  if prev then true else
+  Set.is_member order x ys
+    (fun () -> false)
+    (fun () -> true)
 
 (* Define tests *)
 let set_union_sound =

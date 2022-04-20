@@ -3,6 +3,9 @@ type t =
   | LT
   | GT
 
+type 'a total =
+  'a -> 'a -> t
+
 let _total left right =
   if left = right then EQ else
   if left < right then LT else

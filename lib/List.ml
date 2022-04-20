@@ -3,29 +3,29 @@ open Functional
 let nil = []
 let cons x xs = x :: xs
 
-let fold null_case list_case term =
+let fold items null_case list_case =
   let rec _visit xs return =
     match xs with
     | [] -> return null_case
     | x :: xs' ->
       _visit xs' (return <== (list_case x))
   in
-  _visit term identity
+  _visit items identity
 
-let fold_rev null_case list_case term =
+let fold_rev items null_case list_case =
   let rec _visit xs result =
     match xs with
     | [] -> result
     | x :: xs' ->
       _visit xs' (list_case x result)
   in
-  _visit term null_case
+  _visit items null_case
 
-let length xs =
-  fold_rev Nat.zero (fun _x -> Nat.succ) xs
+let length items =
+  fold_rev items Nat.zero (fun _x -> Nat.succ)
 
-let iter f xs =
-  fold () (fun x () -> f x) xs
+let iter items func =
+  fold items () (fun item () -> func item)
 
 let init count item =
   if count <= 0 then [] else
@@ -35,14 +35,14 @@ let init count item =
   in
   _visit 0 []
 
-let map f xs =
-  fold [] (cons <== f) xs
+let map func items =
+  fold items [] (cons <== func)
 
-let conc xs ys =
-  fold ys cons xs
+let conc left right =
+  fold left right cons
 
-let flatten xs =
-  fold [] conc xs
+let flatten items =
+  fold items [] conc
 
 let rec zip xs ys fail return =
   match xs, ys with

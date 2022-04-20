@@ -3,7 +3,7 @@ open Functional
 let zero = 0
 let succ n = n + 1
 
-let fold zero_case succ_case n =
+let fold n zero_case succ_case =
   if n <= 0 then zero_case else
   let rec _visit n return =
     match n with

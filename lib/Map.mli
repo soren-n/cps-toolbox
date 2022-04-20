@@ -1,20 +1,20 @@
-type ('key, 'value) map
+type ('key, 'value) t
 
-val empty : ('key, 'value) map
-val size : ('key, 'value) map -> int
-val fold : 'r -> ('key -> 'value -> 'r -> 'r) -> ('key, 'value) map -> 'r
-val map : ('a -> 'b) -> ('key, 'a) map -> ('key, 'b) map
-val contains : ('key -> 'key -> Order.t) -> 'key  -> ('key, 'value) map
+val empty : ('key, 'value) t
+val size : ('key, 'value) t -> int
+val fold : ('key, 'value) t -> 'r -> ('key -> 'value -> 'r -> 'r) -> 'r
+val map : ('a -> 'b) -> ('key, 'a) t -> ('key, 'b) t
+val contains : 'key Order.total -> 'key  -> ('key, 'value) t
   -> (unit -> 'r) -> (unit -> 'r) -> 'r
-val insert : ('key -> 'key -> Order.t) -> 'key -> 'value -> ('key, 'value) map
-  -> ('key, 'value) map
-val remove : ('key -> 'key -> Order.t) -> 'key -> ('key, 'value) map
-  -> ('key, 'value) map
-val lookup : ('key -> 'key -> Order.t) -> 'key -> ('key, 'value) map
+val insert : 'key Order.total -> 'key -> 'value -> ('key, 'value) t
+  -> ('key, 'value) t
+val remove : 'key Order.total -> 'key -> ('key, 'value) t
+  -> ('key, 'value) t
+val lookup : 'key Order.total -> 'key -> ('key, 'value) t
   -> (unit -> 'r) -> ('value -> 'r) -> 'r
-val lookup_unsafe : ('key -> 'key -> Order.t) -> 'key -> ('key, 'value) map
+val lookup_unsafe : 'key Order.total -> 'key -> ('key, 'value) t
   -> 'value
-val entries : ('key, 'value) map -> ('key * 'value) list
-val keys : ('key, 'value) map -> 'key list
-val values : ('key, 'value) map -> 'value list
-val from_entries : ('key * 'value) list -> ('key, 'value) map
+val entries : ('key, 'value) t -> ('key * 'value) list
+val keys : ('key, 'value) t -> 'key list
+val values : ('key, 'value) t -> 'value list
+val from_entries : ('key * 'value) list -> ('key, 'value) t

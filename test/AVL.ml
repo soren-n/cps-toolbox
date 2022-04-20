@@ -30,8 +30,8 @@ let arbitrary_avl order a =
     ?print:(Option.map avl_print a.print)
     ~shrink:avl_shrink
 
-let compute_height =
-  AVL.fold 0 (fun _ _ _ l r -> (max l r) + 1)
+let compute_height tree =
+  AVL.fold tree 0 (fun _ _ _ l r -> (max l r) + 1)
 
 let height_is_height =
   QCheck.Test.make ~count:100
@@ -40,8 +40,8 @@ let height_is_height =
     (fun tree ->
       (AVL.get_height tree) = (compute_height tree))
 
-let compute_count =
-  AVL.fold 0 (fun _ _ _ l r -> l + r + 1)
+let compute_count tree =
+  AVL.fold tree 0 (fun _ _ _ l r -> l + r + 1)
 
 let count_is_count =
   QCheck.Test.make ~count:1000

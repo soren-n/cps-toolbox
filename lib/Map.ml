@@ -1,118 +1,99 @@
-open Functional
-
-type ('key, 'value) data =
+type ('key, 'value) _entry =
   | Peek of 'key
   | Bind of 'key * 'value
 
-type ('key, 'value) map = (('key, 'value) data) AVL.tree
+type ('key, 'value) t = ('key, 'value) _entry AVL.t
 
-let _peek key = Peek key
-let _bind key value = Bind (key, value)
+let _entry_peek key = Peek key
 
-let get_key data =
-  match data with
+let _entry_bind key value = Bind (key, value)
+
+let _entry_key entry =
+  match entry with
   | Peek key -> key
   | Bind (key, _) -> key
 
-let get_value data fail return =
-  match data with
+let _entry_value entry fail return =
+  match entry with
   | Peek _ -> fail ()
   | Bind (_, value) -> return value
 
-let get_value_unsafe data return =
-  match data with
+let _entry_value_unsafe entry =
+  match entry with
   | Peek _ -> assert false
-  | Bind (_, value) -> return value
+  | Bind (_, value) -> value
+
+let _entry_order key_order left right =
+  key_order (_entry_key left) (_entry_key right)
 
 let empty = AVL.null
 let size = AVL.get_count
 
-let fold empty_case bind_case binds =
-  AVL.to_list binds |> fun binds1 ->
-  List.fold
-    (fun return -> return empty_case)
-    (fun bind visit_binds return ->
-      match bind with
-      | Peek _ -> assert false
-      | Bind (key, value) ->
-        visit_binds @@ fun result ->
-        return (bind_case key value result))
-    binds1 identity
+let fold map empty_case bind_case =
+  AVL.to_list map |> fun map1 ->
+  List.fold map1 empty_case @@ fun bind result ->
+  match bind with
+  | Peek _ -> assert false
+  | Bind (key, value) ->
+    bind_case key value result
 
-let map f binds =
+let map func map =
   AVL.map
     (fun bind ->
       match bind with
       | Peek _ -> assert false
       | Bind (key, value) ->
-        _bind key (f value))
-    binds
+        _entry_bind key (func value))
+        map
 
-let contains key_order key binds fail return =
-  let _bind_order a b = key_order (get_key a) (get_key b) in
-  AVL.is_member _bind_order (_peek key) binds fail return
+let contains key_order key map fail return =
+  AVL.is_member (_entry_order key_order) (_entry_peek key) map fail return
 
-let insert key_order key value binds =
-  let _data_order left right = key_order (get_key left) (get_key right) in
-  AVL.insert _data_order (_bind key value) binds
+let insert key_order key value map =
+  AVL.insert (_entry_order key_order) (_entry_bind key value) map
 
-let remove key_order key binds =
-  let _data_order left right = key_order (get_key left) (get_key right) in
-  AVL.remove _data_order (_peek key) binds
+let remove key_order key map =
+  AVL.remove (_entry_order key_order) (_entry_peek key) map
 
-let lookup order key binds fail return =
-  let open AVL in
+let lookup order key map fail return =
   let open Order in
   let rec _visit tree =
     match tree with
-    | Null -> fail ()
-    | Node (_, _, data, left, right) ->
-      begin match order key (get_key data) with
-      | EQ -> get_value data fail return
+    | AVL.Null -> fail ()
+    | AVL.Node (_, _, entry, left, right) ->
+      begin match order key (_entry_key entry) with
+      | EQ -> _entry_value entry fail return
       | LT -> _visit left
       | GT -> _visit right
       end
   in
-  _visit binds
+  _visit map
 
-let lookup_unsafe order key binds =
-  let open AVL in
+let lookup_unsafe order key map =
   let open Order in
   let rec _visit tree =
     match tree with
-    | Null -> assert false
-    | Node (_, _, data, left, right) ->
-      match order key (get_key data) with
-      | EQ -> get_value_unsafe data identity
+    | AVL.Null -> assert false
+    | AVL.Node (_, _, entry, left, right) ->
+      match order key (_entry_key entry) with
+      | EQ -> _entry_value_unsafe entry
       | LT -> _visit left
       | GT -> _visit right
   in
-  _visit binds
+  _visit map
 
-let entries binds =
-  fold
-    (fun return -> return [])
-    (fun key value visit_binds return ->
-      visit_binds @@ fun result ->
-      return ((key, value) :: result))
-    binds identity
+let entries map =
+  fold map [] @@ fun key value key_values ->
+  (key, value) :: key_values
 
-let keys binds =
-  fold
-    (fun return -> return [])
-    (fun key _value visit_binds return ->
-      visit_binds @@ fun result ->
-      return (key :: result))
-    binds identity
+let keys map =
+  fold map [] @@ fun key _value result ->
+  key :: result
 
-let values binds =
-  fold
-    (fun return -> return [])
-    (fun _key value visit_binds return ->
-      visit_binds @@ fun result ->
-      return (value :: result))
-    binds identity
+let values map =
+  fold map [] @@ fun _key value result ->
+  value :: result
 
 let from_entries entries =
-  List.map (fun (key, value) -> _bind key value) entries |> fun binds ->
-  AVL.from_list binds
+  let _to_entry (key, value) = _entry_bind key value in
+  List.map _to_entry entries |> AVL.from_list

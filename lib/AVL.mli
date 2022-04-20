@@ -1,22 +1,20 @@
-type 'a tree =
+type 'a t =
   | Null
-  | Node of int * int * 'a * 'a tree * 'a tree
+  | Node of int * int * 'a * 'a t * 'a t
 
-type 'a compare = 'a -> 'a -> Order.t
-
-val null : 'a tree
-val node : int -> int -> 'a -> 'a tree -> 'a tree -> 'a tree
-val fold : 'r -> (int -> int -> 'a -> 'r -> 'r -> 'r) -> 'a tree -> 'r
-val map : ('a -> 'b) -> 'a tree -> 'b tree
-val get_count : 'a tree -> int
-val get_height : 'a tree -> int
-val insert : 'a compare -> 'a -> 'a tree -> 'a tree
-val remove : 'a compare -> 'a -> 'a tree -> 'a tree
+val null : 'a t
+val node : int -> int -> 'a -> 'a t -> 'a t -> 'a t
+val fold : 'a t -> 'r -> (int -> int -> 'a -> 'r -> 'r -> 'r) -> 'r
+val map : ('a -> 'b) -> 'a t -> 'b t
+val get_count : 'a t -> int
+val get_height : 'a t -> int
+val insert : 'a Order.total -> 'a -> 'a t -> 'a t
+val remove : 'a Order.total -> 'a -> 'a t -> 'a t
 val is_member :
-  'a compare -> 'a -> 'a tree ->
+  'a Order.total -> 'a -> 'a t ->
   (unit -> 'r) -> (unit -> 'r) -> 'r
-val get_member : int -> 'a tree -> (unit -> 'r) -> ('a -> 'r) -> 'r
-val get_leftmost : 'a tree -> (unit -> 'r) -> ('a -> 'r) -> 'r
-val get_rightmost : 'a tree -> (unit -> 'r) -> ('a -> 'r) -> 'r
-val to_list : 'a tree -> 'a list
-val from_list : 'a list -> 'a tree
+val get_member : int -> 'a t -> (unit -> 'r) -> ('a -> 'r) -> 'r
+val get_leftmost : 'a t -> (unit -> 'r) -> ('a -> 'r) -> 'r
+val get_rightmost : 'a t -> (unit -> 'r) -> ('a -> 'r) -> 'r
+val to_list : 'a t -> 'a list
+val from_list : 'a list -> 'a t

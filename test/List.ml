@@ -3,11 +3,11 @@ open Functional
 
 let _gen_iota count =
   let open QCheck.Gen in
-  Nat.fold
+  Nat.fold count
     (fun _index return -> return [])
     (fun visit_pred index return ->
       visit_pred (index + 1) (return <== (List.cons index)))
-    count 0 @@ fun xs ->
+    0 @@ fun xs ->
   shuffle_l xs >>= fun xs1 ->
   return (xs1, count)
 

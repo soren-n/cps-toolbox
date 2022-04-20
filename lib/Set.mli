@@ -1,24 +1,23 @@
-type 'a set
-type 'a compare = 'a -> 'a -> Order.t
-val empty : 'a set
-val is_empty : 'a set -> bool
-val is_member : 'a compare -> 'a -> 'a set -> (unit -> 'r) -> (unit -> 'r) -> 'r
-val get_member : int -> 'a set -> (unit -> 'r) -> ('a -> 'r) -> 'r
-val get_member_unsafe : int -> 'a set -> 'a
-val size : 'a set -> int
-val add : 'a compare -> 'a -> 'a set -> 'a set
-val remove : 'a compare -> 'a -> 'a set -> 'a set
-val to_list : 'a set -> 'a list
-val from_list : 'a list -> 'a set
-val fold : 'r -> ('a -> 'r -> 'r) -> 'a set -> 'r
-val map : ('a -> 'b) -> 'a set -> 'b set
-val union : 'a compare -> 'a set -> 'a set -> 'a set
-val difference : 'a compare -> 'a set -> 'a set -> 'a set
-val intersection : 'a compare -> 'a set -> 'a set -> 'a set
-val has_intersection : 'a compare -> 'a set -> 'a set
+type 'a t
+val empty : 'a t
+val is_empty : 'a t -> bool
+val is_member : 'a Order.total -> 'a -> 'a t -> (unit -> 'r) -> (unit -> 'r) -> 'r
+val get_member : int -> 'a t -> (unit -> 'r) -> ('a -> 'r) -> 'r
+val get_member_unsafe : int -> 'a t -> 'a
+val size : 'a t -> int
+val add : 'a Order.total -> 'a -> 'a t -> 'a t
+val remove : 'a Order.total -> 'a -> 'a t -> 'a t
+val to_list : 'a t -> 'a list
+val from_list : 'a list -> 'a t
+val fold : 'a t -> 'r -> ('a -> 'r -> 'r) -> 'r
+val map : ('a -> 'b) -> 'a t -> 'b t
+val union : 'a Order.total -> 'a t -> 'a t -> 'a t
+val difference : 'a Order.total -> 'a t -> 'a t -> 'a t
+val intersection : 'a Order.total -> 'a t -> 'a t -> 'a t
+val has_intersection : 'a Order.total -> 'a t -> 'a t
   -> (unit -> 'r) -> (unit -> 'r) -> 'r
-val first : 'a set -> (unit -> 'r) -> ('a -> 'r) -> 'r
-val first_unsafe : 'a set -> 'a
-val last : 'a set -> (unit -> 'r) -> ('a -> 'r) -> 'r
-val last_unsafe : 'a set -> 'a
-val compare : ('a -> 'a -> Order.t) -> 'a set -> 'a set -> Order.t
+val first : 'a t -> (unit -> 'r) -> ('a -> 'r) -> 'r
+val first_unsafe : 'a t -> 'a
+val last : 'a t -> (unit -> 'r) -> ('a -> 'r) -> 'r
+val last_unsafe : 'a t -> 'a
+val order : ('a -> 'a -> Order.t) -> 'a t -> 'a t -> Order.t

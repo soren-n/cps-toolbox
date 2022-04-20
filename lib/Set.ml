@@ -1,7 +1,6 @@
 open Functional
 
-type 'a set = 'a AVL.tree
-type 'a compare = 'a -> 'a -> Order.t
+type 'a t = 'a AVL.t
 
 let empty = AVL.null
 let is_empty set = (AVL.get_count set) = 0
@@ -19,17 +18,16 @@ let remove = AVL.remove
 let to_list = AVL.to_list
 let from_list = AVL.from_list
 
-let fold empty_case item_case items =
+let fold items empty_case item_case =
   AVL.to_list items |> fun items1 ->
-  List.fold empty_case item_case items1
+  List.fold items1 empty_case item_case
 
-let map f items =
+let map func items =
   AVL.to_list items |> fun items1 ->
-  List.map f items1 |> fun items2 ->
+  List.map func items1 |> fun items2 ->
   AVL.from_list items2
 
 let union order xs ys =
-  let open AVL in
   let open Order in
   let _cont k x xs = k (x :: xs) in
   let rec _visit xs ys return =
@@ -47,7 +45,6 @@ let union order xs ys =
   _visit xs1 ys1 from_list
 
 let difference order xs ys =
-  let open AVL in
   let open Order in
   let _cont k x xs = k (x :: xs) in
   let rec _visit xs ys return =
@@ -65,7 +62,6 @@ let difference order xs ys =
   _visit xs1 ys1 from_list
 
 let intersection order xs ys =
-  let open AVL in
   let open Order in
   let _cont k x xs = k (x :: xs) in
   let rec _visit xs ys return =
@@ -82,7 +78,6 @@ let intersection order xs ys =
   _visit xs1 ys1 from_list
 
 let has_intersection order xs ys fail return =
-  let open AVL in
   let open Order in
   let rec _visit xs ys =
     match xs, ys with
@@ -109,7 +104,7 @@ let last_unsafe values =
     (fun () -> assert false)
     identity
 
-let compare order left right =
+let order item_order left right =
   let open Order in
   let rec _visit left right =
     match left, right with
@@ -117,7 +112,7 @@ let compare order left right =
     | [], _ -> LT
     | _, [] -> GT
     | l :: left1, r :: right1 ->
-      match order l r with
+      match item_order l r with
       | EQ -> _visit left1 right1
       | LT -> LT
       | GT -> GT

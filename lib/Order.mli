@@ -3,5 +3,8 @@ type t =
   | LT
   | GT
 
-val int : int -> int -> t
-val string : string -> string -> t
+type 'a total =
+  'a -> 'a -> t
+
+val int : int total
+val string : string total
