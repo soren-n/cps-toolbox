@@ -24,6 +24,16 @@ let fold_rev items null_case list_case =
 let length items =
   fold_rev items Nat.zero (fun _x -> Nat.succ)
 
+let get index items error return =
+  if index >= (length items) then error () else
+  let rec _visit index items =
+    match index, items with
+    | 0, item :: _items1 -> return item
+    | _, _item :: items1 -> _visit (index - 1) items1
+    | _, _ -> error ()
+  in
+  _visit index items
+
 let iter items func =
   fold items () (fun item () -> func item)
 

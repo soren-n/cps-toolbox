@@ -2,6 +2,12 @@ type ('key, 'value) t
 
 val empty : ('key, 'value) t
 val size : ('key, 'value) t -> int
+val case :
+  'key Order.total
+  -> ('key, 'value) t
+  -> 'r
+  -> ('key -> 'value -> ('key, 'value) t -> 'r)
+  -> 'r
 val fold : ('key, 'value) t -> 'r -> ('key -> 'value -> 'r -> 'r) -> 'r
 val map : ('a -> 'b) -> ('key, 'a) t -> ('key, 'b) t
 val contains : 'key Order.total -> 'key  -> ('key, 'value) t

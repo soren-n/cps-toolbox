@@ -3,6 +3,7 @@ val cons : 'a -> 'a list -> 'a list
 val length : 'a list -> int
 val fold : 'a list -> 'r -> ('a -> 'r -> 'r) -> 'r
 val fold_rev : 'a list -> 'r -> ('a -> 'r -> 'r) -> 'r
+val get : int -> 'a list -> (unit -> 'r) -> ('a -> 'r) -> 'r
 val iter : 'a list -> ('a -> unit) -> unit
 val init : int -> 'a -> 'a list
 val map : ('a -> 'b) -> 'a list -> 'b list
